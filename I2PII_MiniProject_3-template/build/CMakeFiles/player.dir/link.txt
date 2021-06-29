@@ -1,0 +1,3 @@
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\player.dir/objects.a
+C:\MinGW\bin\ar.exe cr CMakeFiles\player.dir/objects.a @CMakeFiles\player.dir\objects1.rsp
+C:\MinGW\bin\mingw32-g++.exe -O2 -Wall -Wextra -g   -Wl,--whole-archive CMakeFiles\player.dir/objects.a -Wl,--no-whole-archive  -o ..\player.exe -Wl,--out-implib,libplayer.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\player.dir\linklibs.rsp

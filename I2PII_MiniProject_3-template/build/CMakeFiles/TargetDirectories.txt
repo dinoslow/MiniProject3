@@ -1,0 +1,4 @@
+C:/Winston/projects/I2PII_MiniProject_3-template/build/CMakeFiles/edit_cache.dir
+C:/Winston/projects/I2PII_MiniProject_3-template/build/CMakeFiles/main.dir
+C:/Winston/projects/I2PII_MiniProject_3-template/build/CMakeFiles/player.dir
+C:/Winston/projects/I2PII_MiniProject_3-template/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,12 @@
+[
+{
+  "directory": "C:/Winston/projects/I2PII_MiniProject_3-template/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe    -O2 -Wall -Wextra -g   -std=gnu++14 -o CMakeFiles\\main.dir\\main.cpp.obj -c C:\\Winston\\projects\\I2PII_MiniProject_3-template\\main.cpp",
+  "file": "C:/Winston/projects/I2PII_MiniProject_3-template/main.cpp"
+},
+{
+  "directory": "C:/Winston/projects/I2PII_MiniProject_3-template/build",
+  "command": "C:\\MinGW\\bin\\mingw32-g++.exe    -O2 -Wall -Wextra -g   -std=gnu++14 -o CMakeFiles\\player.dir\\player.cpp.obj -c C:\\Winston\\projects\\I2PII_MiniProject_3-template\\player.cpp",
+  "file": "C:/Winston/projects/I2PII_MiniProject_3-template/player.cpp"
+}
+]
