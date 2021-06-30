@@ -5,21 +5,19 @@
 #include <cstdlib>
 #include <ctime>
 
-#include "src/LOG.h"
 #define MAXIMUM 0x7fffffff
 #define MINIMUM -0x7fffffff
 static const int SIZE = 8;
-std::ifstream fin;
 std::ofstream fout;
 
 int board_importants[8][8] = {
     {3000, -300, 500, 100, 100, 500, -300, 3000},
-    {-300, -500, 0, 0, 0, 0, -500, -300},
-    {500, 0, 50, 50, 50, 50, 0, 500},
-    {100, 0, 50, 100, 100, 50, 0, 100},
-    {100, 0, 50, 100, 100, 50, 0, 100},
-    {500, 0, 50, 50, 50, 50, 0, 500},
-    {-300, -500, 0, 0, 0, 0, -500, -300},
+    {-300, -500, 10, 10, 10, 10, -500, -300},
+    {500, 10, 50, 50, 50, 50, 10, 500},
+    {100, 10, 50, 100, 100, 50, 10, 100},
+    {100, 10, 50, 100, 100, 50, 10, 100},
+    {500, 10, 50, 50, 50, 50, 10, 500},
+    {-300, -500, 10, 10, 10, 10, -500, -300},
     {3000, -300, 500, 100, 100, 500, -300, 3000},
 };
 
@@ -62,6 +60,10 @@ class OthelloBoard {
     int getHeuristicValue(int player) {
         int h = 0;
         h += disc_count[player] - disc_count[get_next_player(player)];
+        std::vector<Point> op_valid_spots = get_valid_spots(get_next_player(3 - player));
+        int left = 0, total = op_valid_spots.size();
+        for(auto it : op_valid_spots) if(it.x < 5) left++;
+        h += 5 * (left / total) * (disc_count[1]);
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] == player) {
@@ -124,7 +126,9 @@ class OthelloBoard {
 
    public:
     OthelloBoard() {
-        disc_count = {0, 0, 0};
+        disc_count[EMPTY] = 60;
+        disc_count[BLACK] = 2;
+        disc_count[WHITE] = 2;
     }
     OthelloBoard(const OthelloBoard &copied) {
         OthelloBoard();
@@ -137,13 +141,10 @@ class OthelloBoard {
                 Point p = Point(i, j);
                 if (board[i][j] != EMPTY) continue;
                 if (is_spot_valid(p, player)) {
-                    // LOG() << "NO\n";
                     valid_spots.push_back(p);
                 }
             }
         }
-        // LOG() << "sp\n";
-        // if(valid_spots.empty()) LOG() << "Empty\n";
         return valid_spots;
     }
     void put_disc(Point p, int player) {
@@ -154,10 +155,8 @@ class OthelloBoard {
     }
     bool is_board_terminate() {
         if (this->disc_count[0] == 0) return true;
-        std::vector<Point> me = get_valid_spots(cur_player);
-        std::vector<Point> op = get_valid_spots(get_next_player(cur_player));
-        if (me.size() != 0) return false;
-        if (op.size() != 0) return false;
+        if (get_valid_spots(cur_player).size() != 0) return false;
+        if (get_valid_spots(get_next_player(cur_player)).size() != 0) return false;
         return true;
     }
     void init() {
@@ -171,32 +170,9 @@ class OthelloBoard {
     }
 };
 
-std::ostream &operator<<(std::ostream &os, const OthelloBoard &rhs) {
-    os << "+---------------+\n";
-    for (int i = 0; i < SIZE; i++) {
-        os << "|";
-        for (int j = 0; j < SIZE; j++) {
-            switch (rhs.board[i][j]) {
-                case 1:
-                    os << "O";
-                    break;
-                case 2:
-                    os << "X";
-                    break;
-                default:
-                    os << " ";
-                    break;
-            }
-            if (j != SIZE - 1) os << " ";
-        }
-        os << "|\n";
-    }
-    os << "+---------------+\n";
-    return os;
-}
 OthelloBoard cur_board;
 
-void read_board() {
+void read_board(std::ifstream& fin) {
     fin >> cur_player;
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
@@ -205,7 +181,7 @@ void read_board() {
     }
 }
 
-void read_valid_spots() {
+void read_valid_spots(std::ifstream& fin) {
     int n_valid_spots;
     fin >> n_valid_spots;
     int x, y;
@@ -221,26 +197,20 @@ void write_valid_spot(Point p) {
 }
 
 int alphabeta(OthelloBoard state, int depth, int a, int b, bool maximizingPlayer) {
-    // if terminate win or lose
     if (state.is_board_terminate() || depth == 0)
         return state.getHeuristicValue(cur_player);
     OthelloBoard next_state;
     if (maximizingPlayer) {
         int val = MINIMUM;
-        // if(next_state.next_valid_spots.empty()) LOG() << "empty\n";
         state.next_valid_spots = state.get_valid_spots(cur_player);
         for (auto it : state.next_valid_spots) {
             next_state = state;
             next_state.put_disc(it, cur_player);
             int next_val = alphabeta(next_state, depth - 1, a, b, false);
             if (next_val > val) {
-                val = next_val;
-                if (depth == MAXDEPTH) {
-                    write_valid_spot(it);
-                    LOG() << "Val of " << it.x << " " << it.y << " is " << val << "\n"
-                          << next_state;
-                }
+                if (depth == MAXDEPTH) write_valid_spot(it);
             }
+            val = std::max(val, next_val);
             a = std::max(a, val);
             if (a >= b) break;
         }
@@ -261,26 +231,16 @@ int alphabeta(OthelloBoard state, int depth, int a, int b, bool maximizingPlayer
 }
 
 int main(int, char **argv) {
-    fin.open(argv[1]);
+    std::ifstream fin(argv[1]);
     fout.open(argv[2]);
-    read_board();
-    read_valid_spots();
+    read_board(fin);
+    read_valid_spots(fin);
     write_valid_spot(fin_next_valid_spots[0]);
     cur_board.init();
 
-    LOG::initialize();
-    LOG() << "=====================\nCurrent Board:\n"
-          << cur_board
-          << "\nblack: " << cur_board.disc_count[1] << "\nwhite: " << cur_board.disc_count[2] << "\n";
-    for (auto it = fin_next_valid_spots.begin(); it != fin_next_valid_spots.end(); it++) {
-        auto nxtit = it;
-        LOG() << "(" << (*it).x << ", " << (*it).y << ")" << (++nxtit != fin_next_valid_spots.end() ? ", " : "\n");
-    }
     alphabeta(cur_board, MAXDEPTH, MINIMUM, MAXIMUM, true);
-    LOG() << "End\n=====================\n";
 
     fin.close();
     fout.close();
-    LOG::terminate();
     return 0;
 }

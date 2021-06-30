@@ -5,7 +5,7 @@ OSTYPE = linux
 endif
 
 PLAYER1 = player
-PLAYER2 = baseline/$(OSTYPE)/baseline1
+PLAYER2 = baseline/$(OSTYPE)/baseline4
 
 CXX			= g++
 CXXFLAGS	= --std=c++14 -O2
