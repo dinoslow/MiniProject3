@@ -19,7 +19,7 @@ class LOG {
         ERROR,
         NONE
     };
-    static std::ofstream fout;
+    static std::ofstream LOGFOUT;
     TYPE type;
     LOG(TYPE type = NONE) : type(type) {}
     ~LOG() {}
@@ -27,25 +27,25 @@ class LOG {
     LOG& operator<<(const T& msg) {
         switch (this->type) {
             case INFO:
-                fout << "[INFO]: ";
+                LOGFOUT << "[INFO]: ";
                 break;
             case ERROR:
-                fout << "[ERROR]: ";
+                LOGFOUT << "[ERROR]: ";
                 break;
             default:
                 break;
         }
-        this->fout << msg;
-        this->fout.flush();
+        this->LOGFOUT << msg;
+        this->LOGFOUT.flush();
         return *this;
     }
     static void initialize() {
-        fout.open("debuglog.txt", std::ofstream::ate | std::ofstream::app);
+        LOGFOUT.open("debuglog.txt", std::ofstream::ate | std::ofstream::app);
     }
     static void terminate() {
-        fout.close();
+        LOGFOUT.close();
     }
 };
-std::ofstream LOG::fout;
+std::ofstream LOG::LOGFOUT;
 
 #endif
